@@ -307,11 +307,6 @@
       <input type="password" id="geminiKey" placeholder="AIza...">
       <div class="hint">Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a></div>
     </div>
-    <div class="field">
-      <label for="googleClientId">Google OAuth client ID</label>
-      <input type="text" id="googleClientId" placeholder="xxxx.apps.googleusercontent.com">
-      <div class="hint">From Google Cloud Console → Credentials → OAuth client ID (Web application). See the README for the exact steps.</div>
-    </div>
     <button class="btn btn-secondary" id="saveSettingsBtn">Save settings</button>
   </div>
 
@@ -377,6 +372,10 @@
 </div>
 
 <script>
+  // ---------- config ----------
+  // Not a secret — Google client IDs are meant to be public, this is what identifies the app.
+  const GOOGLE_CLIENT_ID = '528489608361-bmmqhn77f10bpqp0a8a3oftd3p63khhh.apps.googleusercontent.com';
+
   // ---------- state ----------
   let imageBase64 = null;
   let imageMime = null;
@@ -389,12 +388,9 @@
   // ---------- settings ----------
   function loadSettings(){
     $('geminiKey').value = localStorage.getItem('stub_gemini_key') || '';
-    $('googleClientId').value = localStorage.getItem('stub_google_client_id') || '';
   }
   function saveSettings(){
     localStorage.setItem('stub_gemini_key', $('geminiKey').value.trim());
-    localStorage.setItem('stub_google_client_id', $('googleClientId').value.trim());
-    initGoogle();
     $('settingsPanel').classList.remove('open');
     flash($('extractStatus'), 'Settings saved.', 'ok');
   }
@@ -527,10 +523,9 @@
 
   // ---------- google sign-in ----------
   function initGoogle(){
-    const clientId = localStorage.getItem('stub_google_client_id');
-    if (!clientId || !window.google) { gsiReady = false; return; }
+    if (!window.google) { gsiReady = false; return; }
     tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: clientId,
+      client_id: GOOGLE_CLIENT_ID,
       scope: 'https://www.googleapis.com/auth/calendar.events',
       callback: (resp) => {
         if (resp.error){ flash($('calStatus'), 'Sign-in failed: ' + resp.error, 'err'); return; }
@@ -544,8 +539,6 @@
   window.addEventListener('load', () => setTimeout(initGoogle, 300));
 
   $('signInBtn').onclick = () => {
-    const clientId = localStorage.getItem('stub_google_client_id');
-    if (!clientId){ $('settingsPanel').classList.add('open'); flash($('calStatus'), 'Add your Google OAuth client ID first.', 'err'); return; }
     if (!tokenClient) initGoogle();
     tokenClient.requestAccessToken();
   };
