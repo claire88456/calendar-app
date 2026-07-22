@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stub — screenshot to calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{
+    --ink:#17140f;
+    --paper:#efe7d4;
+    --paper-dim:#e2d8bf;
+    --rust:#bb4419;
+    --teal:#1c6b62;
+    --line:#c9bd9d;
+    --ok:#1c6b62;
+    --err:#9c2b1f;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:560px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+  }
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:28px;
+  }
+  .brand{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:28px;
+    letter-spacing:-0.02em;
+    color:var(--paper);
+  }
+  .brand span{color:var(--rust);}
+  .tagline{
+    font-size:12px;
+    color:#8f8a78;
+    margin-top:2px;
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.02em;
+  }
+  button.gear{
+    background:none;
+    border:1px solid #3a3626;
+    color:#c9c3ac;
+    width:36px;height:36px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:16px;
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  button.gear:hover{border-color:var(--rust);color:var(--paper);}
+
+  .panel{
+    background:#1d1a13;
+    border:1px solid #35301f;
+    border-radius:var(--radius);
+    padding:18px;
+    margin-bottom:20px;
+    display:none;
+  }
+  .panel.open{display:block;}
+  .panel h3{
+    margin:0 0 12px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#a39c81;
+  }
+  .field{margin-bottom:12px;}
+  .field label{
+    display:block;
+    font-size:12px;
+    color:#8f8a78;
+    margin-bottom:5px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .field input, .field textarea{
+    width:100%;
+    background:#100e0a;
+    border:1px solid #3a3626;
+    color:var(--paper);
+    border-radius:8px;
+    padding:9px 10px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+  }
+  .field input:focus, .field textarea:focus{outline:1px solid var(--rust);border-color:var(--rust);}
+  .hint{font-size:11px;color:#6f6a58;margin-top:4px;line-height:1.5;}
+  .hint a{color:#a39c81;}
+
+  .dropzone{
+    border:2px dashed #3a3626;
+    border-radius:var(--radius);
+    padding:40px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+    position:relative;
+  }
+  .dropzone.drag{border-color:var(--rust);background:#1d1a13;}
+  .dropzone .icon{font-size:28px;margin-bottom:10px;opacity:.8;}
+  .dropzone p{margin:0;font-size:14px;color:#a39c81;}
+  .dropzone .sub{font-size:12px;color:#6f6a58;margin-top:6px;}
+  #fileInput{display:none;}
+
+  .preview-wrap{margin-top:16px;position:relative;display:none;}
+  .preview-wrap.show{display:block;}
+  .preview-wrap img{
+    width:100%;
+    max-height:280px;
+    object-fit:contain;
+    border-radius:var(--radius);
+    border:1px solid #3a3626;
+    background:#100e0a;
+  }
+  .clear-btn{
+    position:absolute;top:8px;right:8px;
+    background:rgba(16,14,10,0.85);
+    border:1px solid #3a3626;
+    color:var(--paper);
+    width:28px;height:28px;border-radius:50%;
+    cursor:pointer;font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    gap:8px;
+    width:100%;
+    margin-top:16px;
+    padding:13px 18px;
+    border-radius:999px;
+    border:none;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-primary{background:var(--rust);color:#fbf3e4;}
+  .btn-secondary{background:transparent;border:1px solid #3a3626;color:var(--paper);}
+  .btn-google{background:var(--paper);color:var(--ink);}
+
+  .status{
+    margin-top:12px;
+    font-size:13px;
+    font-family:'IBM Plex Mono', monospace;
+    color:#a39c81;
+    display:none;
+  }
+  .status.show{display:block;}
+  .status.err{color:#e08a76;}
+  .status.ok{color:#6fbcaf;}
+
+  /* Ticket stub */
+  .ticket{
+    margin-top:24px;
+    display:none;
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:var(--radius);
+    position:relative;
+    overflow:visible;
+  }
+  .ticket.show{display:block;}
+  .ticket-top{
+    padding:22px 22px 18px;
+  }
+  .ticket-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--rust);
+    margin-bottom:8px;
+  }
+  .ticket-title-input{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:26px;
+    line-height:1.15;
+    background:transparent;
+    border:none;
+    border-bottom:1px dashed var(--line);
+    width:100%;
+    padding:2px 0 6px;
+    color:var(--ink);
+  }
+  .ticket-title-input:focus{outline:none;border-color:var(--rust);}
+
+  .perf{
+    position:relative;
+    height:0;
+    border-top:1px dashed var(--line);
+    margin:0 0;
+  }
+  .perf::before, .perf::after{
+    content:'';
+    position:absolute;
+    top:-11px;
+    width:22px;height:22px;
+    background:var(--ink);
+    border-radius:50%;
+  }
+  .perf::before{left:-11px;}
+  .perf::after{right:-11px;}
+
+  .ticket-grid{
+    padding:18px 22px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 16px;
+  }
+  .ticket-grid .full{grid-column:1/-1;}
+  .tf label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#8a8163;
+    margin-bottom:4px;
+  }
+  .tf input, .tf textarea{
+    width:100%;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    color:var(--ink);
+    padding:4px 0;
+  }
+  .tf textarea{font-family:'IBM Plex Sans', sans-serif;resize:vertical;min-height:44px;}
+  .tf input:focus, .tf textarea:focus{outline:none;border-color:var(--rust);}
+
+  .allday-row{
+    display:flex;align-items:center;gap:8px;
+    padding:0 22px 4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:#5b5540;
+  }
+
+  .ticket-bottom{
+    padding:16px 22px 22px;
+  }
+  .barcode{
+    height:34px;
+    background:repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 5px, var(--ink) 5px 6px, transparent 6px 11px, var(--ink) 11px 14px, transparent 14px 16px);
+    opacity:.85;
+    border-radius:2px;
+    margin-bottom:14px;
+  }
+
+  a.event-link{color:var(--teal);font-weight:600;}
+
+  footer{
+    text-align:center;
+    font-size:11px;
+    color:#5b5540;
+    margin-top:36px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  @media (max-width:420px){
+    .ticket-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="brand">Stub<span>.</span></div>
+      <div class="tagline">screenshot → event → calendar</div>
+    </div>
+    <button class="gear" id="gearBtn" title="Settings">⚙</button>
+  </header>
+
+  <div class="panel" id="settingsPanel">
+    <h3>Settings — stored only in this browser</h3>
+    <div class="field">
+      <label for="geminiKey">Gemini API key</label>
+      <input type="password" id="geminiKey" placeholder="AIza...">
+      <div class="hint">Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a></div>
+    </div>
+    <div class="field">
+      <label for="googleClientId">Google OAuth client ID</label>
+      <input type="text" id="googleClientId" placeholder="xxxx.apps.googleusercontent.com">
+      <div class="hint">From Google Cloud Console → Credentials → OAuth client ID (Web application). See the README for the exact steps.</div>
+    </div>
+    <button class="btn btn-secondary" id="saveSettingsBtn">Save settings</button>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <div class="icon">📇</div>
+    <p>Tap to choose a screenshot, or drag one here</p>
+    <div class="sub">Event invite, poster, Instagram post, email — any of it</div>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <div class="preview-wrap" id="previewWrap">
+    <button class="clear-btn" id="clearBtn">✕</button>
+    <img id="previewImg" alt="Screenshot preview">
+  </div>
+
+  <button class="btn btn-primary" id="extractBtn" disabled>Extract event details</button>
+  <div class="status" id="extractStatus"></div>
+
+  <div class="ticket" id="ticket">
+    <div class="ticket-top">
+      <div class="ticket-eyebrow">Extracted event</div>
+      <input class="ticket-title-input" id="fTitle" placeholder="Event title">
+    </div>
+    <div class="perf"></div>
+    <div class="ticket-grid">
+      <div class="tf">
+        <label>Date</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="tf">
+        <label>Timezone</label>
+        <input type="text" id="fTz">
+      </div>
+      <div class="tf">
+        <label>Starts</label>
+        <input type="time" id="fStart">
+      </div>
+      <div class="tf">
+        <label>Ends</label>
+        <input type="time" id="fEnd">
+      </div>
+      <div class="tf full">
+        <label>Location</label>
+        <input type="text" id="fLocation" placeholder="—">
+      </div>
+      <div class="tf full">
+        <label>Notes</label>
+        <textarea id="fDescription" placeholder="—"></textarea>
+      </div>
+    </div>
+    <div class="allday-row">
+      <input type="checkbox" id="fAllDay"> <label for="fAllDay" style="margin:0;">All-day event</label>
+    </div>
+    <div class="ticket-bottom">
+      <div class="barcode"></div>
+      <button class="btn btn-google" id="signInBtn">Sign in with Google</button>
+      <button class="btn btn-primary" id="addBtn" style="display:none;">Add to Google Calendar</button>
+      <div class="status" id="calStatus"></div>
+    </div>
+  </div>
+
+  <footer>runs entirely in your browser · keys stay on this device</footer>
+</div>
+
+<script>
+  // ---------- state ----------
+  let imageBase64 = null;
+  let imageMime = null;
+  let tokenClient = null;
+  let accessToken = null;
+  let gsiReady = false;
+
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- settings ----------
+  function loadSettings(){
+    $('geminiKey').value = localStorage.getItem('stub_gemini_key') || '';
+    $('googleClientId').value = localStorage.getItem('stub_google_client_id') || '';
+  }
+  function saveSettings(){
+    localStorage.setItem('stub_gemini_key', $('geminiKey').value.trim());
+    localStorage.setItem('stub_google_client_id', $('googleClientId').value.trim());
+    initGoogle();
+    $('settingsPanel').classList.remove('open');
+    flash($('extractStatus'), 'Settings saved.', 'ok');
+  }
+  $('gearBtn').onclick = () => $('settingsPanel').classList.toggle('open');
+  $('saveSettingsBtn').onclick = saveSettings;
+
+  function flash(el, msg, kind){
+    el.textContent = msg;
+    el.className = 'status show' + (kind ? ' ' + kind : '');
+  }
+
+  // ---------- upload ----------
+  const dropzone = $('dropzone');
+  const fileInput = $('fileInput');
+  dropzone.onclick = () => fileInput.click();
+  fileInput.onchange = (e) => e.target.files[0] && handleFile(e.target.files[0]);
+
+  ['dragover','dragenter'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+    e.preventDefault(); dropzone.classList.add('drag');
+  }));
+  ['dragleave','drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+    e.preventDefault(); dropzone.classList.remove('drag');
+  }));
+  dropzone.addEventListener('drop', (e) => {
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+  document.addEventListener('paste', (e) => {
+    const item = [...e.clipboardData.items].find(i => i.type.startsWith('image/'));
+    if (item) handleFile(item.getAsFile());
+  });
+
+  function handleFile(file){
+    if (!file.type.startsWith('image/')) return;
+    imageMime = file.type;
+    const reader = new FileReader();
+    reader.onload = () => {
+      imageBase64 = reader.result.split(',')[1];
+      $('previewImg').src = reader.result;
+      $('previewWrap').classList.add('show');
+      $('extractBtn').disabled = false;
+      $('ticket').classList.remove('show');
+    };
+    reader.readAsDataURL(file);
+  }
+  $('clearBtn').onclick = () => {
+    imageBase64 = null;
+    $('previewWrap').classList.remove('show');
+    $('extractBtn').disabled = true;
+    fileInput.value = '';
+  };
+
+  // ---------- gemini extraction ----------
+  const EVENT_SCHEMA = {
+    type: "OBJECT",
+    properties: {
+      title: { type: "STRING" },
+      date: { type: "STRING", description: "ISO date YYYY-MM-DD" },
+      start_time: { type: "STRING", description: "24hr HH:MM, or empty string if unknown/all-day" },
+      end_time: { type: "STRING", description: "24hr HH:MM, or empty string if unknown" },
+      all_day: { type: "BOOLEAN" },
+      location: { type: "STRING" },
+      description: { type: "STRING" },
+      timezone: { type: "STRING", description: "Best-guess IANA timezone, e.g. Europe/Stockholm" }
+    },
+    required: ["title","date","all_day"]
+  };
+
+  $('extractBtn').onclick = async () => {
+    const key = localStorage.getItem('stub_gemini_key');
+    if (!key){ $('settingsPanel').classList.add('open'); flash($('extractStatus'), 'Add your Gemini API key first.', 'err'); return; }
+    if (!imageBase64){ return; }
+
+    $('extractBtn').disabled = true;
+    flash($('extractStatus'), 'Reading the screenshot…', null);
+
+    const today = new Date().toISOString().slice(0,10);
+    const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const body = {
+      contents: [{
+        role: "user",
+        parts: [
+          { text: `Extract the event details from this screenshot. Today's date is ${today} and the user's local timezone is ${browserTz} — use that as a hint for the year and timezone if the image doesn't say. If a field truly cannot be determined, use an empty string (or false for all_day). Return only the structured data.` },
+          { inline_data: { mime_type: imageMime, data: imageBase64 } }
+        ]
+      }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: EVENT_SCHEMA
+      }
+    };
+
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok){
+        const errText = await res.text();
+        throw new Error(`Gemini API error (${res.status}): ${errText.slice(0,200)}`);
+      }
+      const data = await res.json();
+      const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!raw) throw new Error('No data returned — try a clearer screenshot.');
+      const parsed = JSON.parse(raw);
+      fillTicket(parsed, browserTz);
+      flash($('extractStatus'), 'Details extracted — check them below before adding.', 'ok');
+    } catch (err){
+      flash($('extractStatus'), err.message, 'err');
+    } finally {
+      $('extractBtn').disabled = false;
+    }
+  };
+
+  function fillTicket(p, browserTz){
+    $('fTitle').value = p.title || '';
+    $('fDate').value = p.date || '';
+    $('fStart').value = p.start_time || '';
+    $('fEnd').value = p.end_time || '';
+    $('fAllDay').checked = !!p.all_day;
+    $('fLocation').value = p.location || '';
+    $('fDescription').value = p.description || '';
+    $('fTz').value = p.timezone || browserTz;
+    $('ticket').classList.add('show');
+    $('ticket').scrollIntoView({ behavior:'smooth', block:'start' });
+    refreshCalendarButton();
+  }
+
+  // ---------- google sign-in ----------
+  function initGoogle(){
+    const clientId = localStorage.getItem('stub_google_client_id');
+    if (!clientId || !window.google) { gsiReady = false; return; }
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: (resp) => {
+        if (resp.error){ flash($('calStatus'), 'Sign-in failed: ' + resp.error, 'err'); return; }
+        accessToken = resp.access_token;
+        refreshCalendarButton();
+        flash($('calStatus'), 'Signed in. Ready to add the event.', 'ok');
+      }
+    });
+    gsiReady = true;
+  }
+  window.addEventListener('load', () => setTimeout(initGoogle, 300));
+
+  $('signInBtn').onclick = () => {
+    const clientId = localStorage.getItem('stub_google_client_id');
+    if (!clientId){ $('settingsPanel').classList.add('open'); flash($('calStatus'), 'Add your Google OAuth client ID first.', 'err'); return; }
+    if (!tokenClient) initGoogle();
+    tokenClient.requestAccessToken();
+  };
+
+  function refreshCalendarButton(){
+    if (accessToken){
+      $('signInBtn').style.display = 'none';
+      $('addBtn').style.display = 'inline-flex';
+    }
+  }
+
+  // ---------- add to calendar ----------
+  $('addBtn').onclick = async () => {
+    if (!accessToken){ flash($('calStatus'), 'Sign in first.', 'err'); return; }
+    const title = $('fTitle').value.trim();
+    const date = $('fDate').value;
+    if (!title || !date){ flash($('calStatus'), 'Title and date are required.', 'err'); return; }
+
+    const allDay = $('fAllDay').checked;
+    const tz = $('fTz').value.trim() || Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let start, end;
+
+    if (allDay){
+      const endDate = new Date(date);
+      endDate.setDate(endDate.getDate() + 1);
+      start = { date: date };
+      end = { date: endDate.toISOString().slice(0,10) };
+    } else {
+      const startTime = $('fStart').value || '09:00';
+      let endTime = $('fEnd').value;
+      if (!endTime){
+        const [h,m] = startTime.split(':').map(Number);
+        const d = new Date(); d.setHours(h+1, m);
+        endTime = d.toTimeString().slice(0,5);
+      }
+      start = { dateTime: `${date}T${startTime}:00`, timeZone: tz };
+      end = { dateTime: `${date}T${endTime}:00`, timeZone: tz };
+    }
+
+    const event = {
+      summary: title,
+      location: $('fLocation').value.trim(),
+      description: $('fDescription').value.trim(),
+      start, end
+    };
+
+    $('addBtn').disabled = true;
+    flash($('calStatus'), 'Adding to your calendar…', null);
+
+    try {
+      const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(event)
+      });
+      if (!res.ok){
+        const errText = await res.text();
+        throw new Error(`Calendar API error (${res.status}): ${errText.slice(0,200)}`);
+      }
+      const created = await res.json();
+      $('calStatus').innerHTML = `Added! <a class="event-link" href="${created.htmlLink}" target="_blank" rel="noopener">Open in Google Calendar →</a>`;
+      $('calStatus').className = 'status show ok';
+    } catch (err){
+      flash($('calStatus'), err.message, 'err');
+    } finally {
+      $('addBtn').disabled = false;
+    }
+  };
+
+  loadSettings();
+</script>
+</body>
+</html>
