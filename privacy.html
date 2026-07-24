@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stub — Privacy Policy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#17140f;
+    --paper:#efe7d4;
+    --rust:#bb4419;
+    --teal:#1c6b62;
+    --line:#c9bd9d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.6;
+  }
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+  }
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:32px;
+  }
+  a.brand{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:28px;
+    letter-spacing:-0.02em;
+    color:var(--paper);
+    text-decoration:none;
+    display:inline-block;
+  }
+  a.brand span{color:var(--rust);}
+  .tagline{
+    font-size:12px;
+    color:#8f8a78;
+    margin-top:2px;
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.02em;
+  }
+  a.nav-link{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:#8f8a78;
+    text-decoration:none;
+    letter-spacing:0.02em;
+  }
+  a.nav-link:hover{color:var(--paper);}
+  .header-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  footer{
+    text-align:center;
+    font-size:11px;
+    color:#5b5540;
+    margin-top:36px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  footer a{color:#8f8a78;text-decoration:none;}
+  footer a:hover{color:var(--paper);}
+  .brand-old{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:24px;
+    margin-bottom:4px;
+  }
+  .updated{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:#8f8a78;
+    margin-bottom:36px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-size:32px;
+    margin:0 0 4px;
+  }
+  h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--rust);
+    margin:36px 0 10px;
+  }
+  p, li{
+    font-size:15px;
+    color:#e2dcc9;
+  }
+  ul{padding-left:20px;}
+  li{margin-bottom:6px;}
+  a{color:var(--teal);}
+  .card{
+    background:#1d1a13;
+    border:1px solid #35301f;
+    border-radius:14px;
+    padding:16px 18px;
+    margin:20px 0;
+    font-size:14px;
+  }
+  hr{
+    border:none;
+    border-top:1px dashed var(--line);
+    opacity:.3;
+    margin:40px 0;
+  }
+  .contact{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <a class="brand" href="index.html">Stub<span>.</span></a>
+      <div class="tagline">Privacy Policy — last updated 24 July 2026</div>
+    </div>
+    <div class="header-actions">
+      <a class="nav-link" href="index.html">← Back to app</a>
+    </div>
+  </header>
+
+  <h1>Privacy Policy</h1>
+  <p>Stub is a personal, single-purpose tool: you upload a screenshot of an event, it uses Google's Gemini API to read the details, and — with your permission — adds the event to your Google Calendar. This page explains exactly what happens to your data.</p>
+
+  <h2>What this app does not do</h2>
+  <ul>
+    <li>It does not have a server or database. There is nowhere for your data to be stored except your own device and your own Google account.</li>
+    <li>It does not use cookies, analytics, or tracking of any kind.</li>
+    <li>It does not sell, share, or otherwise use your data for advertising.</li>
+    <li>It never sees or stores your Google password. Sign-in happens entirely on Google's own domain.</li>
+  </ul>
+
+  <h2>What data is processed, and where it goes</h2>
+  <div class="card">
+    <strong>Screenshots you upload</strong><br>
+    Sent directly from your browser to Google's Gemini API for the sole purpose of extracting event details (title, date, time, location, description). Handled under <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google's Gemini API terms</a>. Stub itself does not store, log, or retain these images anywhere.
+  </div>
+  <div class="card">
+    <strong>Calendar events</strong><br>
+    Once you review and confirm the extracted details, they're sent directly from your browser to the Google Calendar API to create an event on your own calendar. This requires you to sign in with Google and grant a narrow permission — Stub can only create/edit calendar events, nothing else (it cannot read your email, files, or other Google data).
+  </div>
+  <div class="card">
+    <strong>Your Gemini API key</strong><br>
+    Stored only in your own browser's local storage (<code>localStorage</code>). It is never transmitted to Stub's codebase, any server, or anyone but Google directly when making API requests.
+  </div>
+
+  <h2>Third parties involved</h2>
+  <p>Two, both Google's own services, governed by Google's own policies:</p>
+  <ul>
+    <li><a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google Gemini API</a> — reads uploaded screenshots to extract event details</li>
+    <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Calendar API / Google Sign-In</a> — creates events on your calendar after you authorize it</li>
+  </ul>
+
+  <h2>Your control over this data</h2>
+  <ul>
+    <li>Clear your Gemini key any time from the app's settings panel, or by clearing your browser's site data.</li>
+    <li>Revoke Stub's calendar access any time at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a> — this does not affect your Google password or account.</li>
+    <li>Delete any event Stub created the same way you'd delete any other calendar event.</li>
+  </ul>
+
+  <h2>Children's privacy</h2>
+  <p>Stub is not directed at children and is not intended for use by anyone under 13.</p>
+
+  <hr>
+
+  <h2>Contact</h2>
+  <p class="contact">Questions about this policy or the app: [your email address]</p>
+</div>
+</body>
+</html>
